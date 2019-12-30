@@ -65,10 +65,7 @@ namespace TheArtOfDev.HtmlRenderer.Demo.WPF
             _htmlPanel.ImageLoad += HtmlRenderingHelper.OnImageLoad;
             _htmlPanel.LoadComplete += (sender, args) => _htmlPanel.ScrollToElement("C4");
 
-            _htmlTooltipLabel.AvoidImagesLateLoading = true;
-            _htmlTooltipLabel.StylesheetLoad += HtmlRenderingHelper.OnStylesheetLoad;
-            _htmlTooltipLabel.ImageLoad += HtmlRenderingHelper.OnImageLoad;
-            _htmlTooltipLabel.Text = "<div class='htmltooltip'>" + Common.Resources.Tooltip + "</div>";
+            
 
 
             LoadSamples();

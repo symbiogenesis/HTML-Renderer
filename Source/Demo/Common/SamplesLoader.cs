@@ -81,7 +81,7 @@ namespace TheArtOfDev.HtmlRenderer.Demo.Common
                 string ext = name.Substring(extPos >= 0 ? extPos : 0);
                 string shortName = namePos > 0 && name.Length > 2 ? name.Substring(namePos + 1, name.Length - namePos - ext.Length - 1) : name;
 
-                if (".htm".IndexOf(ext, StringComparison.Ordinal) >= 0)
+                if (ext.IndexOf(".htm", StringComparison.Ordinal) >= 0)
                 {
                     var resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
                     if (resourceStream != null)

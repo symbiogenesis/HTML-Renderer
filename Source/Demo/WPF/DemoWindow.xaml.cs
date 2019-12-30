@@ -44,7 +44,12 @@ namespace TheArtOfDev.HtmlRenderer.Demo.WPF
             Width = SystemParameters.PrimaryScreenWidth * 0.7;
             Height = SystemParameters.PrimaryScreenHeight * 0.8;
 
-            LoadCustomFonts();
+			_htmlTooltipLabel.AvoidImagesLateLoading = true;
+			_htmlTooltipLabel.StylesheetLoad += HtmlRenderingHelper.OnStylesheetLoad;
+			_htmlTooltipLabel.ImageLoad += HtmlRenderingHelper.OnImageLoad;
+			_htmlTooltipLabel.Text = "<div class='htmltooltip'>" + Common.Resources.Tooltip + "</div>";
+
+			LoadCustomFonts();
         }
 
         /// <summary>
