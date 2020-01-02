@@ -21,8 +21,8 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
     /// 
     /// </summary>
     internal static class HtmlParser
-    {
-        /// <summary>
+    {		
+		/// <summary>
         /// Parses the source html to css boxes tree structure.
         /// </summary>
         /// <param name="source">the html source to parse</param>
@@ -38,9 +38,6 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
                 var tagIdx = source.IndexOf('<', startIdx);
                 if (tagIdx >= 0 && tagIdx < source.Length)
                 {
-                    // add the html text as anon css box to the structure
-                    AddTextBox(source, startIdx, tagIdx, ref curBox);
-
                     if (source[tagIdx + 1] == '!')
                     {
                         if (source[tagIdx + 2] == '-')
@@ -58,8 +55,11 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
                     }
                     else
                     {
-                        // parse element tag to css box structure
-                        endIdx = ParseHtmlTag(source, tagIdx, ref curBox) + 1;
+						// add the html text as anon css box to the structure
+						AddTextBox(source, startIdx, tagIdx, ref curBox);
+
+						// parse element tag to css box structure
+						endIdx = ParseHtmlTag(source, tagIdx, ref curBox) + 1;
 
                         if (curBox.HtmlTag != null && curBox.HtmlTag.Name.Equals(HtmlConstants.Style, StringComparison.OrdinalIgnoreCase))
                         {

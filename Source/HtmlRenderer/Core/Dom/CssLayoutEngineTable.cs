@@ -716,10 +716,12 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
             _tableBox.ActualRight = maxRight + GetHorizontalSpacing() + _tableBox.ActualBorderRightWidth;
             _tableBox.ActualBottom = Math.Max(maxBottom, starty) + GetVerticalSpacing() + _tableBox.ActualBorderBottomWidth;
 
-#warning EFR : Added headerbox calculation
-            _headerBox.Location = _tableBox.Location;
-            _headerBox.ActualRight = maxRight + GetHorizontalSpacing() + _headerBox.ActualBorderRightWidth;
-            _headerBox.ActualBottom = Math.Max(maxHeaderBottom, starty) + GetVerticalSpacing() + _headerBox.ActualBorderBottomWidth;
+			if (_headerBox != null)
+			{
+				_headerBox.Location = _tableBox.Location;
+				_headerBox.ActualRight = maxRight + GetHorizontalSpacing() + _headerBox.ActualBorderRightWidth;
+				_headerBox.ActualBottom = Math.Max(maxHeaderBottom, starty) + GetVerticalSpacing() + _headerBox.ActualBorderBottomWidth;
+			}
         }
 
         /// <summary>

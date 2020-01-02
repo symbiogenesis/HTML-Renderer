@@ -65,9 +65,6 @@ namespace TheArtOfDev.HtmlRenderer.Demo.WPF
             _htmlPanel.ImageLoad += HtmlRenderingHelper.OnImageLoad;
             _htmlPanel.LoadComplete += (sender, args) => _htmlPanel.ScrollToElement("C4");
 
-            
-
-
             LoadSamples();
 
             _updateHtmlTimer = new Timer(OnUpdateHtmlTimerTick);
@@ -325,7 +322,7 @@ namespace TheArtOfDev.HtmlRenderer.Demo.WPF
         /// </summary>
         private void OnRenderError(object sender, RoutedEventArgs<HtmlRenderErrorEventArgs> args)
         {
-            Dispatcher.BeginInvoke(new Action(() => MessageBox.Show(args.Data.Message + (args.Data.Exception != null ? "\r\n" + args.Data.Exception : null), "Error in Html Renderer", MessageBoxButton.OK)));
+            Dispatcher.BeginInvoke(new Action(() => MessageBox.Show(args.Data.Type.ToString() + "\n" + args.Data.Message + (args.Data.Exception != null ? "\r\n" + args.Data.Exception : null), "Error in Html Renderer", MessageBoxButton.OK)));
         }
 
         /// <summary>

@@ -27,6 +27,11 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
         /// </summary>
         public const string CssMediaTypes = @"@media[^\{\}]*\{";
 
+		/// <summary>
+		/// Extracts import rule; e.g. @import "styles.css";
+		/// </summary>
+		public const string CssImportRule = @"@import\s+([\s\S]+?);";
+
         /// <summary>
         /// Extracts defined blocks in CSS. 
         /// WARNING: Blocks will include blocks inside at-rules.

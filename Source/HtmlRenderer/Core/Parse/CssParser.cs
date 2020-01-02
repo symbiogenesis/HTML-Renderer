@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using TheArtOfDev.HtmlRenderer.Adapters;
 using TheArtOfDev.HtmlRenderer.Adapters.Entities;
 using TheArtOfDev.HtmlRenderer.Core.Entities;
+using TheArtOfDev.HtmlRenderer.Core.Handlers;
 using TheArtOfDev.HtmlRenderer.Core.Utils;
 
 namespace TheArtOfDev.HtmlRenderer.Core.Parse
@@ -73,12 +74,12 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
         /// <param name="stylesheet">raw css stylesheet to parse</param>
         /// <param name="combineWithDefault">true - combine the parsed css data with default css data, false - return only the parsed css data</param>
         /// <returns>the CSS data with parsed CSS objects (never null)</returns>
-        public CssData ParseStyleSheet(string stylesheet, bool combineWithDefault)
+        public CssData ParseStyleSheet(string stylesheet, bool combineWithDefault, ref List<string> imports)
         {
             var cssData = combineWithDefault ? _adapter.DefaultCssData.Clone() : new CssData();
             if (!string.IsNullOrEmpty(stylesheet))
             {
-                ParseStyleSheet(cssData, stylesheet);
+                ParseStyleSheet(cssData, stylesheet, ref imports);
             }
             return cssData;
         }
@@ -91,14 +92,13 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
         /// </summary>
         /// <param name="cssData">the CSS data to fill with parsed CSS objects</param>
         /// <param name="stylesheet">raw css stylesheet to parse</param>
-        public void ParseStyleSheet(CssData cssData, string stylesheet)
+        public void ParseStyleSheet(CssData cssData, string stylesheet, ref List<string> imports)
         {
             if (!String.IsNullOrEmpty(stylesheet))
             {
                 stylesheet = RemoveStylesheetComments(stylesheet);
-
+				imports = ParseImportStatement(stylesheet);
                 ParseStyleBlocks(cssData, stylesheet);
-
                 ParseMediaStyleBlocks(cssData, stylesheet);
             }
         }
@@ -209,7 +209,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
 
                     if (endIdx < stylesheet.Length)
                     {
-                        while (Char.IsWhiteSpace(stylesheet[startIdx]))
+                        while (char.IsWhiteSpace(stylesheet[startIdx]))
                             startIdx++;
                         var substring = stylesheet.Substring(startIdx, endIdx - startIdx + 1);
                         FeedStyleBlock(cssData, substring);
@@ -266,6 +266,62 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
                 }
             }
         }
+
+		/// <summary>
+		/// Parse imports and return urls to imported stylesheets
+		/// </summary>
+		/// <param name="stylesheet">The stylesheet to parse</param>
+		/// <returns>CSS imports</returns>
+		private List<string> ParseImportStatement(string stylesheet)
+		{
+			int startIdx = 0;
+			List<string> imports = new List<string>(1);
+			MatchCollection importsCollection = RegexParserUtils.Match(RegexParserUtils.CssImportRule, stylesheet);
+
+			foreach (Match import in importsCollection)
+			{
+				string importValue = import.Value;
+
+				int urlStartIdx = importValue.IndexOf("url(", StringComparison.InvariantCultureIgnoreCase);
+
+				if (urlStartIdx >= 0)
+				{
+					urlStartIdx += 4;
+					int urlEndIdx = importValue.IndexOf(')', urlStartIdx);
+
+					if (urlEndIdx > -1)
+					{
+						urlEndIdx -= 1;
+						while (urlStartIdx < urlEndIdx && (char.IsWhiteSpace(importValue[urlStartIdx]) || importValue[urlStartIdx] == '\'' || importValue[urlStartIdx] == '"'))
+							urlStartIdx++;
+						while (urlStartIdx < urlEndIdx && (char.IsWhiteSpace(importValue[urlEndIdx]) || importValue[urlEndIdx] == '\'' || importValue[urlEndIdx] == '"'))
+							urlEndIdx--;
+
+						if (urlStartIdx <= urlEndIdx)
+						{
+							string url = importValue.Substring(urlStartIdx, urlEndIdx - urlStartIdx + 1);
+							imports.Add(url);
+						}
+					}
+				}
+				else
+				{
+					urlStartIdx = importValue.IndexOf('"');
+					urlStartIdx = urlStartIdx == -1 ? importValue.IndexOf('\'') : urlStartIdx;
+
+					if (urlStartIdx >= 0)
+					{
+						int urlEndIdx = importValue.LastIndexOf('"');
+						urlEndIdx = urlEndIdx == -1 ? importValue.IndexOf('\'') : urlEndIdx;
+
+						string url = importValue.Substring(urlStartIdx + 1, urlEndIdx - urlStartIdx - 1);
+						imports.Add(url);
+					}
+				}
+			}
+
+			return imports;
+		}
 
         /// <summary>
         /// Feeds the style with a block about the specific media.<br/>

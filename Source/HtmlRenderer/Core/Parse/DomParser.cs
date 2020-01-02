@@ -11,6 +11,7 @@
 // "The Art of War"
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using TheArtOfDev.HtmlRenderer.Adapters.Entities;
 using TheArtOfDev.HtmlRenderer.Core.Dom;
@@ -107,9 +108,15 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
                     CssData stylesheetData;
                     StylesheetLoadHandler.LoadStylesheet(htmlContainer, box.GetAttribute("href", string.Empty), box.HtmlTag.Attributes, out stylesheet, out stylesheetData);
                     if (stylesheet != null)
-                        _cssParser.ParseStyleSheet(cssData, stylesheet);
+					{
+						var imports = new List<string>();
+						_cssParser.ParseStyleSheet(cssData, stylesheet, ref imports);
+						LoadImports(imports, box, cssData, htmlContainer);
+					}
                     else if (stylesheetData != null)
-                        cssData.Combine(stylesheetData);
+					{
+						cssData.Combine(stylesheetData);
+					}
                 }
 
                 // Check for the <style> tag
@@ -117,7 +124,11 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
                 {
                     CloneCssData(ref cssData, ref cssDataChanged);
                     foreach (var child in box.Boxes)
-                        _cssParser.ParseStyleSheet(cssData, child.Text.CutSubstring());
+					{
+						var imports = new List<string>();
+						_cssParser.ParseStyleSheet(cssData, child.Text.CutSubstring(), ref imports);
+						LoadImports(imports, box, cssData, htmlContainer);
+					}
                 }
             }
 
@@ -127,6 +138,30 @@ namespace TheArtOfDev.HtmlRenderer.Core.Parse
             }
         }
 
+		private void LoadImports(List<string> imports, CssBox box, CssData cssData, HtmlContainerInt htmlContainer)
+		{
+			foreach (var import in imports)
+			{
+				string stylesheet;
+				CssData stylesheetData;
+				StylesheetLoadHandler.LoadStylesheet(htmlContainer, import, box.HtmlTag.Attributes, out stylesheet, out stylesheetData);
+				if (stylesheet != null)
+				{
+					var innerImports = new List<string>();
+					CssData innerData = new CssData();
+					_cssParser.ParseStyleSheet(innerData, stylesheet, ref innerImports);
+					cssData.Combine(innerData);
+					if (innerImports.Count > 0)
+					{
+						LoadImports(innerImports, box, cssData, htmlContainer);
+					}
+				}
+				else if (stylesheetData != null)
+				{
+					cssData.Combine(stylesheetData);
+				}
+			}
+		}
 
         /// <summary>
         /// Applies style to all boxes in the tree.<br/>

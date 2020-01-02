@@ -38,7 +38,7 @@ namespace TheArtOfDev.HtmlRenderer.Adapters
         public abstract void AddItem(string text, bool enabled, EventHandler onClick);
 
         /// <summary>
-        /// Remove the last item from the context menu iff it is a divider
+        /// Remove the last item from the context menu if it is a divider
         /// </summary>
         public abstract void RemoveLastDivider();
 

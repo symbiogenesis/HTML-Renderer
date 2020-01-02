@@ -64,7 +64,8 @@ namespace TheArtOfDev.HtmlRenderer.Core
         public static CssData Parse(RAdapter adapter, string stylesheet, bool combineWithDefault = true)
         {
             CssParser parser = new CssParser(adapter);
-            return parser.ParseStyleSheet(stylesheet, combineWithDefault);
+			var imports = new List<string>();
+            return parser.ParseStyleSheet(stylesheet, combineWithDefault, ref imports);
         }
 
         /// <summary>

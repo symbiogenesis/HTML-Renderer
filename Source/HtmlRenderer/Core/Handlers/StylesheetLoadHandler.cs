@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text.RegularExpressions;
 using TheArtOfDev.HtmlRenderer.Core.Entities;
 using TheArtOfDev.HtmlRenderer.Core.Utils;
 
@@ -85,19 +86,35 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
             {
                 return LoadStylesheetFromFile(htmlContainer, uri != null ? uri.AbsolutePath : src);
             }
-            else
+            else if (uri.Scheme == "assembly")
+			{
+				return LoadStylesheetFromResources(htmlContainer, uri.Host, uri.LocalPath);
+			}
+			else
             {
                 return LoadStylesheetFromUri(htmlContainer, uri);
             }
         }
 
-        /// <summary>
-        /// Load the stylesheet from local file by given path.
-        /// </summary>
-        /// <param name="htmlContainer">the container of the html to handle load stylesheet for</param>
-        /// <param name="path">the stylesheet file to load</param>
-        /// <returns>the loaded stylesheet string</returns>
-        private static string LoadStylesheetFromFile(HtmlContainerInt htmlContainer, string path)
+		private static string LoadStylesheetFromResources(HtmlContainerInt htmlContainer, string assemblyName, string path)
+		{
+			var asm = System.Reflection.Assembly.LoadFrom(assemblyName);
+			using (var stream = asm.GetManifestResourceStream(path.Substring(1)))
+			{
+				using (var reader = new StreamReader(stream))
+				{
+					return reader.ReadToEnd();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Load the stylesheet from local file by given path.
+		/// </summary>
+		/// <param name="htmlContainer">the container of the html to handle load stylesheet for</param>
+		/// <param name="path">the stylesheet file to load</param>
+		/// <returns>the loaded stylesheet string</returns>
+		private static string LoadStylesheetFromFile(HtmlContainerInt htmlContainer, string path)
         {
             var fileInfo = CommonUtils.TryGetFileInfo(path);
             if (fileInfo != null)

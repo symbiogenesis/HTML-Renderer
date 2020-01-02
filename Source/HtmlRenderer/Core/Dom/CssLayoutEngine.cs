@@ -633,7 +633,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
 
                 if (line.Rectangles.Count > 0)
                 {
-                    foreach (CssBox b in ToList(line.Rectangles.Keys))
+                    foreach (CssBox b in (line.Rectangles.Keys))
                     {
                         RRect r = line.Rectangles[b];
                         line.Rectangles[b] = new RRect(r.X + diff, r.Y, r.Width, r.Height);
@@ -666,7 +666,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
 
                 if (line.Rectangles.Count > 0)
                 {
-                    foreach (CssBox b in ToList(line.Rectangles.Keys))
+                    foreach (CssBox b in (line.Rectangles.Keys))
                     {
                         RRect r = line.Rectangles[b];
                         line.Rectangles[b] = new RRect(r.X + diff, r.Y, r.Width, r.Height);
@@ -698,19 +698,6 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
             //        curx = word.Right + r.OwnerBox.ActualWordSpacing;
             //    }
             //}
-        }
-
-        /// <summary>
-        /// todo: optimizate, not creating a list each time
-        /// </summary>
-        private static List<T> ToList<T>(IEnumerable<T> collection)
-        {
-            List<T> result = new List<T>();
-            foreach (T item in collection)
-            {
-                result.Add(item);
-            }
-            return result;
         }
 
         #endregion
