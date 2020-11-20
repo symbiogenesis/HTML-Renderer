@@ -14,6 +14,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using TheArtOfDev.HtmlRenderer.Adapters.Entities;
 using TheArtOfDev.HtmlRenderer.Core;
 using TheArtOfDev.HtmlRenderer.Core.Entities;
@@ -213,7 +215,8 @@ namespace TheArtOfDev.HtmlRenderer.Adapters
         {
             if (_loadImage == null)
             {
-                var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream("TheArtOfDev.HtmlRenderer.Core.Utils.ImageLoad.png");
+                var assembly = Assembly.LoadFrom(nameof(HtmlRenderer));
+                var stream = assembly.GetManifestResourceStream("TheArtOfDev.HtmlRenderer.Core.Utils.ImageLoad.png");
                 if (stream != null)
                     _loadImage = ImageFromStream(stream);
             }
@@ -227,7 +230,8 @@ namespace TheArtOfDev.HtmlRenderer.Adapters
         {
             if (_errorImage == null)
             {
-                var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream("TheArtOfDev.HtmlRenderer.Core.Utils.ImageError.png");
+                var assembly = Assembly.LoadFrom(nameof(HtmlRenderer));
+                var stream = assembly.GetManifestResourceStream("TheArtOfDev.HtmlRenderer.Core.Utils.ImageError.png");
                 if (stream != null)
                     _errorImage = ImageFromStream(stream);
             }
